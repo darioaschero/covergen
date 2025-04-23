@@ -115,13 +115,29 @@ function getColorFamily(className) {
   return null; 
 }
 
+// Helper function to get color shade (e.g., 500 from 'bg-red-500')
+function getColorShade(className) {
+  const parts = className.split('-');
+  if (parts.length >= 3) {
+    const shade = parseInt(parts[2], 10);
+    return isNaN(shade) ? null : shade;
+  }
+  return null; 
+}
+
 // Function to generate and sort valid color combinations
 export function getValidColorCombinations() {
   let allCombinations = [];
   const colorNames = Object.keys(tailwindColors);
 
-  // 1. Generate all valid combinations with metadata
+  // 1. Generate valid combinations, filtering background shades
   for (const bgName of colorNames) {
+    // *** Filter background colors: Skip shades 100 and 200 ***
+    const bgShade = getColorShade(`bg-${bgName}`);
+    if (bgShade !== null && bgShade < 300) {
+        continue; // Skip if background shade is less than 300
+    }
+
     for (const textName of colorNames) {
       if (bgName === textName) continue; 
 
